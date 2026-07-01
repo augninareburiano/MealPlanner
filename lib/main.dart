@@ -1,0 +1,62 @@
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
+
+import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Initializes Firebase from the Android config (android/app/google-services.json).
+  // After you run `flutterfire configure`, a lib/firebase_options.dart file is
+  // generated and you can switch to:
+  //   await Firebase.initializeApp(
+  //     options: DefaultFirebaseOptions.currentPlatform,
+  //   );
+  await Firebase.initializeApp();
+
+  runApp(const FoodGApp());
+}
+
+class FoodGApp extends StatelessWidget {
+  const FoodGApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'FoodGApp',
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        useMaterial3: true,
+      ),
+      home: const AuthGate(),
+    );
+  }
+}
+
+/// Shows [HomeScreen] when a user is signed in, otherwise [LoginScreen].
+///
+/// Listens to Firebase auth state so signing in/out swaps screens automatically.
+class AuthGate extends StatelessWidget {
+  const AuthGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<User?>(
+      stream: FirebaseAuth.instance.authStateChanges(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+        if (snapshot.hasData) {
+          return const HomeScreen();
+        }
+        return const LoginScreen();
+      },
+    );
+  }
+}

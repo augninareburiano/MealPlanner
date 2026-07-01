@@ -1,0 +1,68 @@
+# =====================================================================
+# Secrets — NEVER commit these
+# =====================================================================
+# Firebase Android config (contains project identifiers/keys)
+google-services.json
+android/app/google-services.json
+
+# Local API keys (Spoonacular, etc.). Keep the *.example.dart template only.
+lib/config/api_config.dart
+**/*.secret.dart
+.env
+*.env
+
+# =====================================================================
+# Flutter / Dart
+# =====================================================================
+.dart_tool/
+.packages
+.pub-cache/
+.pub/
+build/
+pubspec.lock
+
+# Generated Firebase options (regenerate with `flutterfire configure`)
+lib/firebase_options.dart
+
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+migrate_working_dir/
+
+# IntelliJ / Android Studio
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# VS Code
+.vscode/
+
+# =====================================================================
+# Android
+# =====================================================================
+android/.gradle/
+android/captures/
+android/gradlew
+android/gradlew.bat
+android/local.properties
+android/**/GeneratedPluginRegistrant.java
+android/key.properties
+*.jks
+*.keystore
+
+# Symbolication / obfuscation
+app.*.symbols
+app.*.map.json
+
+# Flutter tool caches
+flutter_export_environment.sh
+.flutter-plugins
+.flutter-plugins-dependencies

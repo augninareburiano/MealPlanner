@@ -1,0 +1,27 @@
+name: foodgapp
+description: "FoodGApp — an Android meal-planning and nutrition app (school capstone)."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ">=3.4.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Login/accounts (Firebase Authentication, Email/Password) — used ONLY for login.
+  firebase_core: ^3.6.0
+  firebase_auth: ^5.3.1
+
+  # All app data lives on the phone in SQLite (no cross-device sync, by design).
+  sqflite: ^2.3.3+1
+  path: ^1.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
