@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
@@ -13,6 +14,12 @@ class DatabaseHelper {
   DatabaseHelper._internal();
   static final DatabaseHelper instance = DatabaseHelper._internal();
 
+  /// Test-only: builds a helper backed by an already-open [database] (e.g. an
+  /// in-memory sqflite-ffi database) instead of the on-device file. Pair with
+  /// [onConfigure] and [onCreate] so the test DB uses the same schema/PRAGMAs.
+  @visibleForTesting
+  DatabaseHelper.forTesting(Database database) : _database = database;
+
   static const _databaseName = 'foodgapp.db';
   static const _databaseVersion = 1;
 
@@ -26,15 +33,22 @@ class DatabaseHelper {
     return openDatabase(
       path,
       version: _databaseVersion,
-      onConfigure: (db) async {
-        // Enforce foreign-key relationships (off by default in SQLite).
-        await db.execute('PRAGMA foreign_keys = ON');
-      },
-      onCreate: _onCreate,
+      onConfigure: onConfigure,
+      onCreate: onCreate,
     );
   }
 
-  Future<void> _onCreate(Database db, int version) async {
+  /// Enforces foreign-key relationships (off by default in SQLite). Exposed so
+  /// tests can open an equivalent database with the same configuration.
+  @visibleForTesting
+  static Future<void> onConfigure(Database db) async {
+    await db.execute('PRAGMA foreign_keys = ON');
+  }
+
+  /// Creates the four tables on first open. Exposed for tests so an in-memory
+  /// database can be built with the identical schema.
+  @visibleForTesting
+  static Future<void> onCreate(Database db, int version) async {
     await db.execute('''
       CREATE TABLE user_profile (
         user_id TEXT PRIMARY KEY,
