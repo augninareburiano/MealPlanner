@@ -25,6 +25,9 @@ class FoodGApp extends StatelessWidget {
     return MaterialApp(
       title: 'FoodGApp',
       debugShowCheckedModeBanner: false,
+      // Disable Android's default "stretch" overscroll so scrolling stops
+      // cleanly at the edges instead of stretching the content.
+      scrollBehavior: const _NoStretchScrollBehavior(),
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
         useMaterial3: true,
@@ -32,6 +35,20 @@ class FoodGApp extends StatelessWidget {
       home: const AuthGate(),
     );
   }
+}
+
+/// Scroll behavior that removes the stretch/glow overscroll indicator so lists
+/// stop cleanly at their edges. Applied app-wide via [MaterialApp.scrollBehavior].
+class _NoStretchScrollBehavior extends MaterialScrollBehavior {
+  const _NoStretchScrollBehavior();
+
+  @override
+  Widget buildOverscrollIndicator(
+    BuildContext context,
+    Widget child,
+    ScrollableDetails details,
+  ) =>
+      child;
 }
 
 /// Shows [HomeScreen] when a user is signed in, otherwise [LoginScreen].
