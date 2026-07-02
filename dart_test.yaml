@@ -1,0 +1,6 @@
+# Test configuration. Tests tagged `live` hit real network APIs, so they are
+# skipped in the default `flutter test` run for determinism. Run them on demand:
+#   flutter test --tags live --run-skipped
+tags:
+  live:
+    skip: "Live network test; run with: flutter test --tags live --run-skipped"
