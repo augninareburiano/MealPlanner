@@ -117,11 +117,28 @@ class DatabaseHelper {
     return UserProfile.fromMap(rows.first);
   }
 
+  /// Ensures a `user_profile` row exists for [userId] so meal logs can satisfy
+  /// the foreign key. Inserts a minimal row only when one isn't there yet; an
+  /// existing (fuller) profile is left untouched.
+  Future<void> ensureUserProfile(String userId, {String? email}) async {
+    final db = await database;
+    await db.insert(
+      'user_profile',
+      {'user_id': userId, 'email': email},
+      conflictAlgorithm: ConflictAlgorithm.ignore,
+    );
+  }
+
   // --- meal_log -----------------------------------------------------------
 
   Future<int> insertMealLog(MealLog log) async {
     final db = await database;
     return db.insert('meal_log', log.toMap());
+  }
+
+  Future<int> deleteMealLog(int id) async {
+    final db = await database;
+    return db.delete('meal_log', where: 'id = ?', whereArgs: [id]);
   }
 
   Future<List<MealLog>> getMealLogsForDate(
