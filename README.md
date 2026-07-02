@@ -52,7 +52,24 @@ lib/
 Foreign keys are enabled (`PRAGMA foreign_keys = ON`); `meal_log` and
 `saved_meals` reference `user_profile(user_id)`.
 
+## Current status
+
+The foundation is complete and runs on an Android emulator/device:
+
+- ✅ Login, Register, and a placeholder Home screen (with Sign out)
+- ✅ Firebase Email/Password auth wired up and working
+- ✅ Local SQLite database with all four tables created
+- ⛔ Not built yet: profile setup form, meal logging, DOST-FNRI feedback, and
+  the Spoonacular/TheMealDB recipe features
+
 ## Getting started
 
-This scaffold was hand-authored, so a few one-time setup steps are required
-before the app will build and run. **See [SETUP.md](SETUP.md).**
+The `android/` platform files are committed, so setup is short: install Flutter
++ the Android SDK, run `flutter pub get`, then generate the Firebase config with
+`flutterfire configure`. **Full steps: [SETUP.md](SETUP.md).**
+
+Once set up, day-to-day you just run:
+```
+flutter run
+```
+and use hot reload (save a file to see changes live on the device).
