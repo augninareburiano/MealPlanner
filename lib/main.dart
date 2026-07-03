@@ -3,8 +3,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'firebase_options.dart';
-import 'screens/home_screen.dart';
+import 'screens/app_shell.dart';
 import 'screens/login_screen.dart';
+import 'theme/app_theme.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,16 +26,13 @@ class FoodGApp extends StatelessWidget {
     return MaterialApp(
       title: 'FoodGApp',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
-        useMaterial3: true,
-      ),
+      theme: AppTheme.light,
       home: const AuthGate(),
     );
   }
 }
 
-/// Shows [HomeScreen] when a user is signed in, otherwise [LoginScreen].
+/// Shows [AppShell] when a user is signed in, otherwise [LoginScreen].
 ///
 /// Listens to Firebase auth state so signing in/out swaps screens automatically.
 class AuthGate extends StatelessWidget {
@@ -51,7 +49,7 @@ class AuthGate extends StatelessWidget {
           );
         }
         if (snapshot.hasData) {
-          return const HomeScreen();
+          return const AppShell();
         }
         return const LoginScreen();
       },

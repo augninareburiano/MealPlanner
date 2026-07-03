@@ -63,6 +63,19 @@ class AuthService {
 
   Future<void> signOut() => _auth.signOut();
 
+  /// Sends a password-reset email. Returns null on success, or a user-friendly
+  /// error message on failure.
+  Future<String?> sendPasswordReset(String email) async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email.trim());
+      return null;
+    } on FirebaseAuthException catch (e) {
+      return _messageForCode(e.code);
+    } catch (_) {
+      return 'Something went wrong. Please try again.';
+    }
+  }
+
   /// Turns a Firebase error [code] into a message safe to show a user.
   String _messageForCode(String code) {
     switch (code) {
