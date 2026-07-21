@@ -13,6 +13,7 @@ class UserProfile {
   final double? weightKg;
   final String? activityLevel;
   final String? dietaryPreferences;
+  final String? allergies;
   final String? healthGoal;
 
   const UserProfile({
@@ -26,6 +27,7 @@ class UserProfile {
     this.weightKg,
     this.activityLevel,
     this.dietaryPreferences,
+    this.allergies,
     this.healthGoal,
   });
 
@@ -40,6 +42,7 @@ class UserProfile {
         'weight_kg': weightKg,
         'activity_level': activityLevel,
         'dietary_preferences': dietaryPreferences,
+        'allergies': allergies,
         'health_goal': healthGoal,
       };
 
@@ -54,6 +57,7 @@ class UserProfile {
         weightKg: (map['weight_kg'] as num?)?.toDouble(),
         activityLevel: map['activity_level'] as String?,
         dietaryPreferences: map['dietary_preferences'] as String?,
+        allergies: map['allergies'] as String?,
         healthGoal: map['health_goal'] as String?,
       );
 
@@ -67,6 +71,7 @@ class UserProfile {
     double? weightKg,
     String? activityLevel,
     String? dietaryPreferences,
+    String? allergies,
     String? healthGoal,
   }) =>
       UserProfile(
@@ -80,6 +85,7 @@ class UserProfile {
         weightKg: weightKg ?? this.weightKg,
         activityLevel: activityLevel ?? this.activityLevel,
         dietaryPreferences: dietaryPreferences ?? this.dietaryPreferences,
+        allergies: allergies ?? this.allergies,
         healthGoal: healthGoal ?? this.healthGoal,
       );
 }

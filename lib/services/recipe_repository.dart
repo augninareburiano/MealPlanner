@@ -28,6 +28,11 @@ class RecipeRepository {
   final TheMealDbService _theMealDb;
   final NutritionCacheStore _cache;
 
+  /// True when a nutrition-capable source is available. TheMealDB can still
+  /// find recipes by name without this, but only Spoonacular reports the
+  /// nutritional values, so the UI can warn up front when it isn't set up.
+  bool get hasNutritionSource => _spoonacular.isConfigured;
+
   /// Searches recipes by name. Tries Spoonacular, falls back to TheMealDB when
   /// Spoonacular fails or finds nothing. Results with nutrition are cached.
   Future<List<Recipe>> searchByName(String query) async {
@@ -48,6 +53,11 @@ class RecipeRepository {
 
     await _cacheAll(results);
     return results;
+  }
+
+  /// Browses recipes in a category via TheMealDB (e.g. `Chicken`, `Seafood`).
+  Future<List<Recipe>> browseCategory(String category) async {
+    return _searchBackup(category, byCategory: true);
   }
 
   /// Searches recipes by a nutrition window (calories / macros). Spoonacular
@@ -107,9 +117,14 @@ class RecipeRepository {
     return fetched;
   }
 
-  Future<List<Recipe>> _searchBackup(String query) async {
+  Future<List<Recipe>> _searchBackup(
+    String query, {
+    bool byCategory = false,
+  }) async {
     try {
-      return await _theMealDb.searchByName(query);
+      return byCategory
+          ? await _theMealDb.filterByCategory(query)
+          : await _theMealDb.searchByName(query);
     } on ApiException {
       return [];
     }

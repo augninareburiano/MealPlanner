@@ -29,6 +29,13 @@ class TheMealDbService {
     return meals.cast<Map<String, dynamic>>().map(Recipe.fromTheMealDb).toList();
   }
 
+  /// Lists meals in a category (e.g. `Chicken`, `Seafood`, `Vegetarian`).
+  Future<List<Recipe>> filterByCategory(String category) async {
+    final json = await _get('/filter.php', {'c': category});
+    final meals = (json['meals'] as List?) ?? const [];
+    return meals.cast<Map<String, dynamic>>().map(Recipe.fromTheMealDb).toList();
+  }
+
   Future<Map<String, dynamic>> _get(
     String path,
     Map<String, String> params,
