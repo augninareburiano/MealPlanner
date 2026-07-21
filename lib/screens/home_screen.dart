@@ -19,6 +19,13 @@ class HomeScreen extends StatelessWidget {
         title: const Text('FoodGApp'),
         actions: [
           IconButton(
+            tooltip: 'My profile',
+            icon: const Icon(Icons.person_outline),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ),
+          ),
+          IconButton(
             tooltip: 'Sign out',
             icon: const Icon(Icons.logout),
             onPressed: authService.signOut,
