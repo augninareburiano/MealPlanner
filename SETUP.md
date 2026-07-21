@@ -60,8 +60,41 @@ Verify the core flow:
 - **Sign out** → back to **Login**.
 - **Log in** again → **Home**.
 
-## 5. Later (not built yet)
+## 5. Spoonacular API key
 
-- **Spoonacular API key:** copy `lib/config/api_config.example.dart` to
-  `lib/config/api_config.dart` and fill in `spoonacularApiKey`. That file is
-  gitignored, so the key is never committed.
+Recipe search and the nutrition facts lookup get their nutritional values from
+Spoonacular, so the app needs a key to show them. Without one it still runs:
+recipe search falls back to TheMealDB, which finds dishes by name but carries
+no nutrition, and the facts screen says so up front rather than showing blanks.
+
+1. Get a free key at https://spoonacular.com/food-api (the free tier is enough
+   for development).
+2. Copy `lib/config/api_config.example.dart` to `lib/config/api_config.dart`
+   and fill in `spoonacularApiKey`. That file is gitignored, so the key is
+   never committed.
+
+## 6. Building a release APK
+
+`flutter build apk --release` produces
+`build/app/outputs/flutter-apk/app-release.apk`.
+
+Release builds are signed with the project keystore, which is **not** in the
+repo. Without it the build still succeeds, falling back to a debug key — fine
+for testing, but an APK signed with a different key **cannot be installed as an
+update** over an existing install; the user has to uninstall first, losing
+their local data. To sign as the same app, place the keystore somewhere private
+and create `android/key.properties` (gitignored, and it must be saved **without
+a UTF-8 BOM** or Gradle fails to read it):
+
+```properties
+storePassword=<store password>
+keyPassword=<key password>
+keyAlias=foodgapp
+storeFile=C:/path/to/foodgapp-release.jks
+```
+
+Confirm which key an APK carries with:
+
+```
+apksigner verify --print-certs build/app/outputs/flutter-apk/app-release.apk
+```
