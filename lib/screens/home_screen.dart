@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
 import 'feedback_screen.dart';
+import 'profile_screen.dart';
 
 /// Placeholder home screen. Meal logging and recipe suggestions come later;
 /// the DOST-FNRI daily nutrition feedback is reachable from here.
@@ -17,6 +18,13 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('FoodGApp'),
         actions: [
+          IconButton(
+            tooltip: 'My profile',
+            icon: const Icon(Icons.person_outline),
+            onPressed: () => Navigator.of(context).push(
+              MaterialPageRoute(builder: (_) => const ProfileScreen()),
+            ),
+          ),
           IconButton(
             tooltip: 'Sign out',
             icon: const Icon(Icons.logout),
@@ -57,6 +65,14 @@ class HomeScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
+              FilledButton.icon(
+                onPressed: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const ProfileScreen()),
+                ),
+                icon: const Icon(Icons.person_outline),
+                label: const Text('Edit my profile'),
+              ),
+              const SizedBox(height: 8),
               OutlinedButton.icon(
                 onPressed: authService.signOut,
                 icon: const Icon(Icons.logout),
