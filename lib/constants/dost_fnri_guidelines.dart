@@ -45,6 +45,27 @@ class DostFnriGuidelines {
   /// Total fat (adults ≥19 y): 15–30% of total energy.
   static const fatPercent = EnergyPercentRange(15, 30);
 
+  // --- Other daily reference values ----------------------------------------
+  // Used by the nutrition facts panel to express a single food or meal as a
+  // share of a day's recommendation.
+
+  /// Dietary fibre for adults: 20–25 g/day (NGF). We compare against the
+  /// midpoint, since a facts panel needs one number.
+  static const fibreGramsPerDay = 22.5;
+
+  /// Sodium ceiling: 2000 mg/day (≈5 g of salt) — the NGF's "eat less salty
+  /// foods" guideline, aligned with the WHO limit.
+  static const sodiumMgLimit = 2000.0;
+
+  /// Cholesterol ceiling: 300 mg/day.
+  static const cholesterolMgLimit = 300.0;
+
+  /// Saturated fat should supply less than 10% of total energy.
+  static const saturatedFatPercentLimit = 10.0;
+
+  /// Free/added sugars should supply less than 10% of total energy.
+  static const sugarPercentLimit = 10.0;
+
   // --- Energy yields (Atwater factors) -------------------------------------
 
   static const kcalPerGramCarb = 4.0;
