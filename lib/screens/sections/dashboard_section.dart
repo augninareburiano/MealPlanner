@@ -7,9 +7,11 @@ import '../../services/app_events.dart';
 import '../../services/auth_service.dart';
 import '../../services/daily_budget_controller.dart';
 import '../../services/database_helper.dart';
+import '../../services/nutrition_feedback_engine.dart';
 import '../../utils/date_format.dart';
 import '../../utils/meal_types.dart';
 import '../../widgets/animations.dart';
+import '../../widgets/daily_insights_view.dart';
 import '../../widgets/glass.dart';
 
 /// The post-login landing screen: today's calories (target − eaten + exercise),
@@ -160,11 +162,13 @@ class _DashboardSectionState extends State<DashboardSection> {
         const SizedBox(height: 12),
         FadeSlideIn(delay: _d(2), child: _macrosCard(context)),
         const SizedBox(height: 12),
-        FadeSlideIn(delay: _d(3), child: _todaysMealsCard(context)),
+        FadeSlideIn(delay: _d(3), child: _insightsCard(context)),
         const SizedBox(height: 12),
-        FadeSlideIn(delay: _d(4), child: _waterCard(context)),
+        FadeSlideIn(delay: _d(4), child: _todaysMealsCard(context)),
         const SizedBox(height: 12),
-        FadeSlideIn(delay: _d(5), child: _exerciseCard(context)),
+        FadeSlideIn(delay: _d(5), child: _waterCard(context)),
+        const SizedBox(height: 12),
+        FadeSlideIn(delay: _d(6), child: _exerciseCard(context)),
       ],
     );
   }
@@ -287,6 +291,32 @@ class _DashboardSectionState extends State<DashboardSection> {
           ),
         ],
       ),
+    );
+  }
+
+  /// Daily feedback: today's logged intake assessed against the user's
+  /// DOST-FNRI-derived targets. Rebuilds whenever meals or targets change.
+  ///
+  /// Intake is compared as eaten, without crediting exercise, because the
+  /// comparison being made is against dietary guidelines rather than against
+  /// the day's net energy balance shown in the calories card.
+  Widget _insightsCard(BuildContext context) {
+    return AnimatedBuilder(
+      animation: _budget,
+      builder: (context, _) {
+        final targets = _budget.targets;
+        if (targets == null) {
+          return const GlassCard(
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
+        return DailyInsightsView(
+          feedback: NutritionFeedbackEngine.evaluate(
+            targets: targets,
+            logs: _logs,
+          ),
+        );
+      },
     );
   }
 
