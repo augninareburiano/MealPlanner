@@ -18,6 +18,9 @@ dependencies:
   sqflite: ^2.3.3+1
   path: ^1.9.0
 
+  # Recipe/nutrition API calls (Spoonacular primary, TheMealDB backup).
+  http: ^1.2.2
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
