@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
+import 'feedback_screen.dart';
 
-/// Placeholder home screen. For now it only needs a working Sign Out; meal
-/// logging, recipe suggestions, and DOST-FNRI feedback come later.
+/// Placeholder home screen. Meal logging and recipe suggestions come later;
+/// the DOST-FNRI daily nutrition feedback is reachable from here.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -41,11 +42,21 @@ class HomeScreen extends StatelessWidget {
               ],
               const SizedBox(height: 12),
               const Text(
-                'Meal logging, recipe suggestions, and DOST-FNRI feedback '
-                'are coming soon.',
+                'Meal logging and recipe suggestions are coming soon.',
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const FeedbackScreen()),
+                  ),
+                  icon: const Icon(Icons.insights),
+                  label: const Text("Today's nutrition feedback"),
+                ),
+              ),
+              const SizedBox(height: 12),
               OutlinedButton.icon(
                 onPressed: authService.signOut,
                 icon: const Icon(Icons.logout),

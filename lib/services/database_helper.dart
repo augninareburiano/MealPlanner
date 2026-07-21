@@ -1,6 +1,7 @@
 import 'package:path/path.dart' as p;
 import 'package:sqflite/sqflite.dart';
 
+import '../models/daily_nutrition.dart';
 import '../models/meal_log.dart';
 import '../models/saved_meal.dart';
 import '../models/user_profile.dart';
@@ -136,6 +137,40 @@ class DatabaseHelper {
       orderBy: 'id ASC',
     );
     return rows.map(MealLog.fromMap).toList();
+  }
+
+  /// Sums a day's logged nutrition into a single [DailyNutrition] total.
+  ///
+  /// Aggregation runs in SQLite so partial logging (rows with null macros)
+  /// still yields a usable total — `SUM` skips nulls and `COALESCE` turns a
+  /// day with no logs into zeros rather than nulls.
+  Future<DailyNutrition> getDailyNutrition(
+    String userId,
+    String mealDate,
+  ) async {
+    final db = await database;
+    final rows = await db.rawQuery(
+      '''
+      SELECT
+        COUNT(*)            AS meal_count,
+        COALESCE(SUM(calories), 0) AS calories,
+        COALESCE(SUM(protein), 0)  AS protein,
+        COALESCE(SUM(carbs), 0)    AS carbs,
+        COALESCE(SUM(fat), 0)      AS fat
+      FROM meal_log
+      WHERE user_id = ? AND meal_date = ?
+      ''',
+      [userId, mealDate],
+    );
+    final row = rows.first;
+    return DailyNutrition(
+      mealDate: mealDate,
+      mealCount: (row['meal_count'] as num?)?.toInt() ?? 0,
+      calories: (row['calories'] as num?)?.toDouble() ?? 0,
+      protein: (row['protein'] as num?)?.toDouble() ?? 0,
+      carbs: (row['carbs'] as num?)?.toDouble() ?? 0,
+      fat: (row['fat'] as num?)?.toDouble() ?? 0,
+    );
   }
 
   // --- saved_meals --------------------------------------------------------
