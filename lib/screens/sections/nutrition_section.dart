@@ -6,6 +6,7 @@ import '../../services/daily_budget_controller.dart';
 import '../../widgets/animations.dart';
 import '../../widgets/nutrient_targets_view.dart';
 import '../daily_targets_screen.dart';
+import '../nutrition_search_screen.dart';
 
 /// The Nutrition tab: the user's daily calorie and macro/micronutrient targets,
 /// worked out from their profile using the DOST-FNRI RENI values.
@@ -48,6 +49,12 @@ class _NutritionSectionState extends State<NutritionSection> {
     _load();
   }
 
+  void _openFactsLookup() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const NutritionSearchScreen()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
@@ -70,6 +77,18 @@ class _NutritionSectionState extends State<NutritionSection> {
                   onPressed: _openEditor,
                   icon: const Icon(Icons.tune),
                   label: const Text('Customize targets'),
+                ),
+              ),
+            ),
+            const SizedBox(height: 12),
+            FadeSlideIn(
+              delay: const Duration(milliseconds: 200),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: OutlinedButton.icon(
+                  onPressed: _openFactsLookup,
+                  icon: const Icon(Icons.search),
+                  label: const Text('Look up nutrition facts'),
                 ),
               ),
             ),
