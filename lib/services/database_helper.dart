@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 
 import '../models/daily_nutrition.dart';
 import '../models/meal_log.dart';
+import '../models/recipe.dart';
 import '../models/saved_meal.dart';
 import '../models/user_profile.dart';
 
@@ -189,5 +190,38 @@ class DatabaseHelper {
       orderBy: 'id DESC',
     );
     return rows.map(SavedMeal.fromMap).toList();
+  }
+
+  // --- nutrition_cache ----------------------------------------------------
+
+  /// Returns the cached [Recipe] for [apiMealId], or null when it's missing or
+  /// older than [maxAge]. Skipping stale rows keeps cached nutrition fresh.
+  Future<Recipe?> getCachedRecipe(String apiMealId, {Duration? maxAge}) async {
+    final db = await database;
+    final rows = await db.query(
+      'nutrition_cache',
+      where: 'api_meal_id = ?',
+      whereArgs: [apiMealId],
+      limit: 1,
+    );
+    if (rows.isEmpty) return null;
+
+    final row = rows.first;
+    if (maxAge != null) {
+      final cachedAt = (row['cached_at'] as num?)?.toInt() ?? 0;
+      final age = DateTime.now().millisecondsSinceEpoch - cachedAt;
+      if (age > maxAge.inMilliseconds) return null;
+    }
+    return Recipe.fromCacheMap(row);
+  }
+
+  /// Inserts or refreshes the cached nutrition for [recipe].
+  Future<void> cacheRecipe(Recipe recipe) async {
+    final db = await database;
+    await db.insert(
+      'nutrition_cache',
+      recipe.toCacheMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
   }
 }
