@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 
 import '../services/auth_service.dart';
 import 'feedback_screen.dart';
+import 'nutrition_search_screen.dart';
 
-/// Placeholder home screen. Meal logging and recipe suggestions come later;
-/// the DOST-FNRI daily nutrition feedback is reachable from here.
+/// Placeholder home screen. Meal logging comes later; the DOST-FNRI daily
+/// nutrition feedback and the nutrition facts lookup are reachable from here.
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -42,7 +43,7 @@ class HomeScreen extends StatelessWidget {
               ],
               const SizedBox(height: 12),
               const Text(
-                'Meal logging and recipe suggestions are coming soon.',
+                'Meal logging is coming soon.',
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 24),
@@ -54,6 +55,19 @@ class HomeScreen extends StatelessWidget {
                   ),
                   icon: const Icon(Icons.insights),
                   label: const Text("Today's nutrition feedback"),
+                ),
+              ),
+              const SizedBox(height: 12),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.tonalIcon(
+                  onPressed: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) => const NutritionSearchScreen(),
+                    ),
+                  ),
+                  icon: const Icon(Icons.local_dining),
+                  label: const Text('Look up nutrition facts'),
                 ),
               ),
               const SizedBox(height: 12),

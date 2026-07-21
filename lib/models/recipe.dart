@@ -1,8 +1,13 @@
 import 'dart:convert';
 
+import 'nutrient_amount.dart';
+
 /// A recipe with its nutrition facts, normalised across the two data sources
 /// (Spoonacular and TheMealDB) so the rest of the app doesn't care where it
 /// came from.
+///
+/// All nutrition figures are **per serving** — that is how Spoonacular reports
+/// them — with [servings] saying how many servings the whole dish makes.
 ///
 /// [apiMealId] is source-prefixed (e.g. `spoonacular:715538`,
 /// `themealdb:52772`) so ids from the two sources can never collide as
@@ -16,6 +21,14 @@ class Recipe {
   final double? carbs;
   final double? fat;
 
+  /// How many servings the whole dish makes, when the source says so.
+  final int? servings;
+
+  /// The full nutrient breakdown (fibre, sugar, sodium, vitamins…) when the
+  /// source provides one. Empty for TheMealDB results, which carry no
+  /// nutrition at all.
+  final List<NutrientAmount> nutrients;
+
   /// Where this came from: `spoonacular` or `themealdb`.
   final String source;
 
@@ -28,11 +41,17 @@ class Recipe {
     this.protein,
     this.carbs,
     this.fat,
+    this.servings,
+    this.nutrients = const [],
   });
 
   /// True when the four macro/energy figures are all present.
   bool get hasNutrition =>
       calories != null && protein != null && carbs != null && fat != null;
+
+  /// True when there is a breakdown beyond the four headline macros — i.e.
+  /// enough to fill a nutrition facts panel.
+  bool get hasDetailedNutrition => nutrients.isNotEmpty;
 
   // --- Spoonacular --------------------------------------------------------
 
@@ -41,18 +60,13 @@ class Recipe {
   ///
   /// Both shapes carry `nutrition.nutrients: [{name, amount, unit}, ...]`.
   factory Recipe.fromSpoonacular(Map<String, dynamic> json) {
-    final nutrients =
-        (json['nutrition']?['nutrients'] as List?)?.cast<Map<String, dynamic>>();
+    final nutrients = ((json['nutrition']?['nutrients'] as List?) ?? const [])
+        .cast<Map<String, dynamic>>()
+        .map(NutrientAmount.tryParse)
+        .whereType<NutrientAmount>()
+        .toList(growable: false);
 
-    double? nutrient(String name) {
-      if (nutrients == null) return null;
-      for (final n in nutrients) {
-        if ((n['name'] as String?)?.toLowerCase() == name.toLowerCase()) {
-          return (n['amount'] as num?)?.toDouble();
-        }
-      }
-      return null;
-    }
+    double? nutrient(String name) => nutrients.named([name])?.amount;
 
     return Recipe(
       apiMealId: 'spoonacular:${json['id']}',
@@ -63,6 +77,8 @@ class Recipe {
       protein: nutrient('Protein'),
       carbs: nutrient('Carbohydrates'),
       fat: nutrient('Fat'),
+      servings: (json['servings'] as num?)?.toInt(),
+      nutrients: nutrients,
     );
   }
 
@@ -93,6 +109,9 @@ class Recipe {
 
   // --- nutrition_cache ----------------------------------------------------
 
+  /// The `nutrition_cache` table has a column per headline macro; everything
+  /// else rides along in `raw_json`, so storing the full breakdown needs no
+  /// schema change.
   Map<String, Object?> toCacheMap() => {
         'api_meal_id': apiMealId,
         'meal_name': name,
@@ -103,10 +122,15 @@ class Recipe {
         'raw_json': jsonEncode({
           'image_url': imageUrl,
           'source': source,
+          'servings': servings,
+          'nutrients': nutrients.map((n) => n.toJson()).toList(),
         }),
         'cached_at': DateTime.now().millisecondsSinceEpoch,
       };
 
+  /// Rebuilds a recipe from a cached row. Rows written before the detailed
+  /// breakdown existed simply come back with no [nutrients], which the UI
+  /// already handles as "macros only".
   factory Recipe.fromCacheMap(Map<String, Object?> map) {
     final raw = map['raw_json'] as String?;
     final extra = raw == null
@@ -121,6 +145,11 @@ class Recipe {
       protein: (map['protein'] as num?)?.toDouble(),
       carbs: (map['carbs'] as num?)?.toDouble(),
       fat: (map['fat'] as num?)?.toDouble(),
+      servings: (extra['servings'] as num?)?.toInt(),
+      nutrients: ((extra['nutrients'] as List?) ?? const [])
+          .cast<Map<String, dynamic>>()
+          .map(NutrientAmount.fromJson)
+          .toList(growable: false),
     );
   }
 
